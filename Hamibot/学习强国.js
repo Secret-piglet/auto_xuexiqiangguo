@@ -1036,25 +1036,27 @@ function do_periodic_answer(number) {
     }
 }
 
+//修改过后的滑动验证模块
 /**
  * 处理访问异常
  */
-function handling_access_exceptions() {
+ function handling_access_exceptions() {
     if (text("访问异常").exists()) {
-        // 滑动按钮位置
+        // 滑动按钮位置  ———修改了findOnce(1)
         className('android.view.View').depth(10).clickable(true).waitFor();
-        var pos = className('android.view.View').depth(10).clickable(true).findOnce(1).bounds();
-        // 滑动框右边界
+        var pos = className('android.view.View').depth(10).clickable(true).findOnce(0).bounds();
+        // 滑动框右边界  
         className('android.view.View').depth(9).clickable(false).waitFor();
         var right_border = className('android.view.View').depth(9).clickable(false).findOnce(0).bounds().right;
         while (text("访问异常").exists() || text("刷新").exists()) {
-            // 位置取随机值
-            var randomX = random(pos.left, pos.right);
-            var randomY = random(pos.top, pos.bottom);
-            swipe(randomX, randomY, randomX + right_border, randomY, random(200, 400));
+        // 位置取随机值  ———对初始圆钮的点击范围做了缩小处理
+            var randomX = random(pos.left+20, pos.right-20);
+            var randomY = random(pos.top+20, pos.bottom-20);
+        // 滑动   	    ———对落点Y增加了随机处理，防止产生一条直线而被判定脚本
+            swipe(randomX, randomY, randomX + right_border, randomY+random(50,130), random(1600, 2000));   
             press(randomX + right_border, randomY, 1000);
             sleep(500);
-            // 需要开启新线程获取控件
+         // 需要开启新线程获取控件
             threads.start(function () {
                 if (text("刷新").exists()) {
                     click('刷新');
